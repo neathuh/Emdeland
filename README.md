@@ -1,20 +1,42 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Emdeland - AI Health Assistant
 
-# Run and deploy your AI Studio app
+Полноценное веб-приложение для анализа здоровья с использованием искусственного интеллекта (Gemini API), отслеживанием симптомов и картой медицинских учреждений.
 
-This contains everything you need to run your app locally.
+## 🚀 Как запустить локально
 
-View your app in AI Studio: https://ai.studio/apps/afb3a6ff-f2cb-4cc1-9c29-b22b2ddc9773
+### 1. Требования
+- **Node.js** (версия 18.x или выше)
+- **npm** или **yarn**
 
-## Run Locally
+### 2. Установка
+```bash
+# Клонируйте репозиторий или перейдите в папку
+npm install
+```
 
-**Prerequisites:**  Node.js
+### 3. Настройка окружения
+Создайте файл `.env` в корневой папке и добавьте свой API ключ от Google Gemini:
+```env
+VITE_GEMINI_API_KEY=ваш_ключ
+```
+*Если в коде используется `process.env.GEMINI_API_KEY`, убедитесь, что он пробрасывается через конфиг vite (уже настроено).*
 
+### 4. Firebase
+Проект настроен на работу с Firebase. Конфигурация находится в `firebase-applet-config.json`. 
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+### 5. Запуск
+```bash
+npm run dev
+```
+
+## 🛠 Технологии
+- **React 19** + **TypeScript**
+- **Vite** (сборка)
+- **Tailwind CSS 4** (стилизация)
+- **Google Gemini API** (анализ симптомов)
+- **Firebase** (БД, Auth)
+- **Leaflet** (карты)
+- **Motion** (анимации)
+
+---
+**Важно:** Данное приложение носит справочный характер и не является заменой профессиональной медицинской консультации.
