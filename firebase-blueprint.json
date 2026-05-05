@@ -1,0 +1,98 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "User personal and health profile data",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "age": { "type": "integer" },
+        "gender": { "type": "string", "enum": ["male", "female", "other"] },
+        "weight": { "type": "number" },
+        "height": { "type": "number" },
+        "allergies": { "type": "string" },
+        "chronicDiseases": { "type": "string" },
+        "medications": { "type": "string" },
+        "lifestyle": {
+          "type": "object",
+          "properties": {
+            "sleep": { "type": "string" },
+            "nutrition": { "type": "string" },
+            "sport": { "type": "string" }
+          }
+        },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "name", "email"]
+    },
+    "HealthRecord": {
+      "title": "Health Analysis Record",
+      "description": "Output of AI health analysis session",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "date": { "type": "string", "format": "date-time" },
+        "symptoms": { "type": "string" },
+        "analysis": { "type": "string" },
+        "structuredData": {
+          "type": "object",
+          "properties": {
+            "severity": { "type": "string" },
+            "possibleCauses": { "type": "array", "items": { "type": "string" } },
+            "recommendations": { "type": "array", "items": { "type": "string" } },
+            "urgentSigns": { "type": "array", "items": { "type": "string" } },
+            "overallSummary": { "type": "string" }
+          }
+        }
+      },
+      "required": ["userId", "date", "symptoms"]
+    },
+    "TrackingEntry": {
+      "title": "Daily Tracking Entry",
+      "description": "User daily wellbeing and quick symptom log",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "wellbeing": { "type": "integer", "minimum": 1, "maximum": 10 },
+        "symptoms": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["userId", "date", "wellbeing"]
+    },
+    "Appointment": {
+      "title": "Doctor Appointment",
+      "description": "User scheduled appointments with specialists",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "doctorType": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "time": { "type": "string" },
+        "description": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "confirmed", "cancelled"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "doctorType", "date", "time", "status"]
+    }
+  },
+  "firestore": {
+    "/users/{uid}": {
+      "schema": "User",
+      "description": "User profiles"
+    },
+    "/healthRecords/{recordId}": {
+      "schema": "HealthRecord",
+      "description": "History of AI analyses"
+    },
+    "/tracking/{entryId}": {
+      "schema": "TrackingEntry",
+      "description": "Daily status tracking"
+    },
+    "/appointments/{appointmentId}": {
+      "schema": "Appointment",
+      "description": "Doctor bookings"
+    }
+  }
+}

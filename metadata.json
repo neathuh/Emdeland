@@ -1,0 +1,12 @@
+{
+  "name": "Emdeland",
+  "description": "AI-powered health analysis platform for symptom tracking, medical mapping, and doctor appointment scheduling.",
+  "requestFramePermissions": [
+    "geolocation"
+  ],
+  "majorCapabilities": [
+    "AI Health Analysis",
+    "Medical Mapping",
+    "Symptom Tracking"
+  ]
+}

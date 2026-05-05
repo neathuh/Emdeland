@@ -1,0 +1,95 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Global safety net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isEmailVerified() {
+      return request.auth.token.email_verified == true;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // --- Users ---
+    match /users/{userId} {
+      function isValidUser(data) {
+        return data.keys().hasAll(['uid', 'name', 'email']) 
+          && data.uid is string 
+          && data.name is string && data.name.size() <= 100
+          && data.email is string && data.email.size() <= 100
+          && data.uid == request.auth.uid;
+      }
+
+      allow get: if isOwner(userId);
+      allow create: if isOwner(userId) && isValidUser(request.resource.data);
+      allow update: if isOwner(userId) && isValidUser(request.resource.data)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'name', 'age', 'gender', 'weight', 'height', 'allergies', 
+          'chronicDiseases', 'medications', 'lifestyle'
+        ]);
+    }
+
+    // --- Health Records ---
+    match /healthRecords/{recordId} {
+      function isValidHealthRecord(data) {
+        return data.keys().hasAll(['userId', 'date', 'symptoms'])
+          && data.userId == request.auth.uid
+          && data.userId is string
+          && data.symptoms is string && data.symptoms.size() <= 5000;
+      }
+
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow get: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && isValidHealthRecord(request.resource.data);
+      allow delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+    }
+
+    // --- Tracking ---
+    match /tracking/{entryId} {
+      function isValidTracking(data) {
+        return data.keys().hasAll(['userId', 'date', 'wellbeing'])
+          && data.userId == request.auth.uid
+          && data.wellbeing is int && data.wellbeing >= 1 && data.wellbeing <= 10;
+      }
+
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && isValidTracking(request.resource.data);
+      allow update: if isSignedIn() && resource.data.userId == request.auth.uid 
+        && isValidTracking(request.resource.data)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['wellbeing', 'symptoms']);
+      allow delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+    }
+
+    // --- Appointments ---
+    match /appointments/{appointmentId} {
+      function isValidAppointment(data) {
+        return data.keys().hasAll(['userId', 'doctorType', 'date', 'time', 'status'])
+          && data.userId == request.auth.uid
+          && data.doctorType is string
+          && data.status in ['pending', 'confirmed', 'cancelled'];
+      }
+
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow get: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && isValidAppointment(request.resource.data);
+      allow update: if isSignedIn() && resource.data.userId == request.auth.uid
+        && isValidAppointment(request.resource.data)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'description', 'date', 'time']);
+      allow delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+    }
+  }
+}
